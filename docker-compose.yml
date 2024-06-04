@@ -1,0 +1,42 @@
+version: "2"
+
+services:
+
+  postgresql:
+    image: 'bitnami/postgresql:latest'
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USERNAME: dev
+      POSTGRES_PASSWORD: dev
+      POSTGRES_DATABASE: dev
+    volumes:
+      - database:/bitnami/postgresql
+    networks:
+      - challenge
+
+  redis:
+    image: 'bitnami/redis:latest'
+    ports:
+      - "6379:6379"
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    volumes:
+      - cache:/bitnami/redis
+    networks:
+      - challenge
+  
+  adminer:
+    image: 'adminer'
+    ports:
+      - "5050:8080"
+    networks:
+      - challenge
+  
+volumes:
+  database:
+  cache:
+
+networks:
+  challenge:
+    driver: bridge
