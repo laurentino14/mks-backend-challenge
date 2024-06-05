@@ -12,13 +12,13 @@ Tarefa (funcional)
 Ferramentas requeridas
 ---------------
 
-1. TypeScript
-2. Nest.js
-3. TypeORM
+[x] 1. TypeScript
+[x] 2. Nest.js
+[x] 3. TypeORM 
 4. Swagger
-5. Docker
+[x/?] 5. Docker
 6. Redis
-7. PostgreSQL
+[x] 7. PostgreSQL
 
 Aspectos técnicos
 ---------------

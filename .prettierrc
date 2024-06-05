@@ -5,5 +5,6 @@
   "bracketSpacing": true,
   "jsxSingleQuote": true,
   "rangeStart": 0,
-  "rangeEnd": 80
+  "rangeEnd": 80,
+  "tabWidth": 2
 }

@@ -1,19 +1,45 @@
-import { IsNotEmpty } from 'class-validator'
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator'
 import { randomUUID } from 'crypto'
+import { Column, Entity, PrimaryColumn } from 'typeorm'
 import { Email } from './email'
 import { Password } from './password'
 
+@Entity({name:'users'})
 export class User {
+  @PrimaryColumn({ primary:true, type: 'text', name:'id'})
+  @IsString()
   @IsNotEmpty({ message: 'Name is required' })
   public readonly id: string
+
+  @Column({ type: 'varchar',length:255, nullable: false, name:'name'})
+  @IsString()
   @IsNotEmpty({ message: 'Name is required' })
   private name: string
+
+  @Column({ type: 'varchar',length:255, nullable: false, unique:true, name:'email'})
+  @IsString()
   @IsNotEmpty({ message: 'Email is required' })
-  private readonly email: Email
+  public readonly email: Email
+
+  @Column({ type: 'varchar',length:255, nullable: false, name:'password'})
+  @IsString()
   @IsNotEmpty({ message: 'Password is required' })
-  private readonly password: Password
+  public readonly password: Password
+
+  @Column({ type: 'varchar',length:50, nullable:false, name:'created_at'})
+  @IsString()
+  @IsNotEmpty({ message: 'Created At is required' })
   public readonly createdAt: string
+
+
+  @Column({ type: 'varchar',length:50, nullable:true, name:'updated_at'})
+  @IsString()
+  @IsOptional()
   private updatedAt: string|null
+  
+  @IsString()
+  @IsOptional()
+  @Column({ type: 'varchar',length:50, nullable:true, name:'deleted_at'})
   private deletedAt: string|null
 
 
@@ -39,6 +65,18 @@ export class User {
 
   getId(): string {
     return this.id
+  }
+
+  getName(): string {
+    return this.name
+  }
+
+  getUpdatedAt(): string|null {
+    return this.updatedAt
+  }
+
+  getDeletedAt(): string|null {
+    return this.deletedAt
   }
 
   updateUser(data:{name?:string, email?:string, password?:string}){

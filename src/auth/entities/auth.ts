@@ -2,7 +2,7 @@ import { User } from './user'
 
 export class Auth {
   constructor(
-    public readonly user: User,
+    public readonly user: Omit<User, 'password'>,
     private readonly access_token: string,
     private readonly refresh_token: string,
   ) {
