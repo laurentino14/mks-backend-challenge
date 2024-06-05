@@ -1,5 +1,5 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { MovieController } from './movie.controller';
+import { Test, TestingModule } from '@nestjs/testing'
+import { MovieController } from './movie.controller'
 
 describe('MovieController', () => {
   let controller: MovieController;

@@ -7,3 +7,11 @@ export abstract class ErrorMessage {
   })
   message: string
 }
+
+export abstract class NotFoundMessage {
+  @ApiProperty({
+    type: String,
+    example: `Not found`,
+  })
+  message: string
+}

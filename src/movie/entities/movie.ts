@@ -110,6 +110,18 @@ export class Movie {
     }
     this.updatedAt = new Date().toISOString()
   }
+
+  toJSON(){
+    return {
+      id: this.id,
+      title: this.title,
+      slug: this.slug.getValue(),
+      category: this.category,
+      launchedIn: this.launchedIn,
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt ,
+    }
+  }
 }
 
 export class MovieFactory{

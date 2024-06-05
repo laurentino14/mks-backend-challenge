@@ -1,5 +1,9 @@
-import { Injectable } from '@nestjs/common'
-import { InjectRepository } from '@nestjs/typeorm'
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common'
+import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateMovieInputContract, UpdateMovieInputContract } from './contracts/movie';
 import { Movie, MovieFactory } from './entities/movie';
@@ -13,17 +17,26 @@ export class MovieService {
 
         movie.slug.generate(movie.getTitle())
 
-        await this.movieRepository.save(movie)
+        const db = await this.movieRepository.save(movie)
+
+        if(!db){
+            throw new BadRequestException("Error saving to database")
+        }
 
         return movie
     }
 
     async getByID(id:string):Promise<Movie>{
-        return await this.movieRepository.findOne({
+        const movie = await this.movieRepository.findOne({
             where:{
                 id
             }
         })
+
+        if(!movie){
+            throw new NotFoundException('Movie not found')
+        }
+        return movie
     }
 
     async getAll():Promise<Movie[]>{
@@ -37,11 +50,20 @@ export class MovieService {
     async update(data:UpdateMovieInputContract):Promise<Movie>{
         const movie = await this.movieRepository.findOne({where:{id:data.id}})
         movie.update(data)
-        await this.movieRepository.update(null,movie)
+        
+        const db = await this.movieRepository.update({id:data.id},movie)
+
+        if(!db){
+            throw new BadRequestException('Error when updating in database')
+        }
+        
         return movie
     }
 
     async delete(id:string):Promise<void>{
-        await this.movieRepository.delete({id})
+        const db = await this.movieRepository.delete({id})
+        if(!db.affected){
+            throw new BadRequestException('Error when deleting in database')
+        }
     }
 }

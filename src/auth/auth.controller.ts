@@ -1,13 +1,11 @@
+import { Body, Controller, Get, Headers, Post, Res } from '@nestjs/common'
 import {
-  Body,
-  Controller,
-  Get,
-  Header,
-  Headers,
-  Post,
-  Res,
-} from '@nestjs/common'
-import { ApiBearerAuth, ApiBody, ApiHeader, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+  ApiBearerAuth,
+  ApiBody,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger'
 import { Response } from 'express'
 import { ErrorMessage } from 'src/contracts/errors'
 import { AuthService } from './auth.service'
@@ -20,7 +18,6 @@ export class AuthController {
     constructor(private readonly service:AuthService) {}
     
     @Post()
-    @Header('Cache-Control', 'none')
     @ApiOperation({
         summary:'Sign In',
         description: 'Sign in an user by your own credentials'
@@ -49,7 +46,6 @@ export class AuthController {
     }
 
     @Post('signup')
-    @Header('Cache-Control', 'none')
     @ApiOperation({
         summary:'Sign Up',
         description: 'Sign up an user'
@@ -59,7 +55,7 @@ export class AuthController {
         required:true,
     })
     @ApiResponse({
-        status:200,
+        status:201,
         type:Auth,
         description:'Success case'
     })
@@ -71,23 +67,17 @@ export class AuthController {
     async signUp(@Body() body:CreateUserInputContract, @Res() res:Response):Promise<Response<Auth>> {
         try{
             const auth = await this.service.signUp(body)
-            return res.status(200).json(auth)
+            return res.status(201).json(auth)
         }catch(err:unknown){
             return res.status(400).json({message:'Something went wrong, please try again'})
         }
     }
 
     @Get()
-    @Header('Cache-Control', 'none')
-    @ApiBearerAuth()
+    @ApiBearerAuth("REFRESH")
     @ApiOperation({
         summary:'Refresh Token',
         description: 'Refresh auth tokens if the refresh token is valid',
-    })
-    @ApiHeader({
-        name:'Authorization',
-        allowEmptyValue:true,
-        description:'Fill this field with any value  ***Take the real token inside the unlock button at the right side***',
     })
     @ApiResponse({
         status:200,

@@ -8,13 +8,21 @@ async function bootstrap() {
   // Setup global validation pipe
   app.useGlobalPipes(new ValidationPipe())
   const config = new DocumentBuilder().addBearerAuth({
-    description:'Please, enter token in following format: Bearer <JWT>',
+    description:'PLEASE INSERT ONLY THE TOKEN, WITHOUT THE "Bearer" (only here on swagger)',
     type:'http',
     in:'header',
     name:'Authorization',
     bearerFormat:'Bearer',
     scheme:'Bearer'
-  })
+  },'ACCESS')
+    .addBearerAuth({
+      description:'PLEASE INSERT ONLY THE TOKEN, WITHOUT THE "Bearer" (only here on swagger)',
+      type:'http',
+      in:'header',
+      name:'Authorization',
+      bearerFormat:'Bearer',
+      scheme:'Bearer'
+    },'REFRESH')
     .setTitle('MKS Challenge')
     .setDescription('Backend challenge for the company MKS')
     .setVersion('1.0')
