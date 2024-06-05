@@ -1,4 +1,4 @@
-import { CACHE_MANAGER } from '@nestjs/cache-manager'
+import { CACHE_MANAGER, CacheStore } from '@nestjs/cache-manager'
 import {
   Body,
   Controller,
@@ -11,8 +11,8 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { Cache } from 'cache-manager';
 import { Response } from 'express';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { ErrorMessage, NotFoundMessage } from 'src/contracts/errors';
@@ -26,7 +26,7 @@ import { MovieService } from './movie.service';
 @ApiTags('Movie')
 export class MovieController {
 
-    constructor(private readonly service:MovieService, @Inject(CACHE_MANAGER) private redis: Cache,){}
+    constructor(private readonly service:MovieService, @Inject(CACHE_MANAGER) private redis: CacheStore,private readonly config:ConfigService){}
 
     @Post()
     @ApiOperation({
@@ -75,8 +75,14 @@ export class MovieController {
     })
     async getByID(@Param('id') id:string,@Res() res:Response):Promise<Response<Movie>>{
         try{
+            const cached = await this.redis.get(`get-movie-${id}`)
+            if(cached){
+                console.log(`get-movie-${id} - hit on cache`)
+                return res.status(200).json(cached) 
+            }
             const movie = await this.service.getByID(id)
-
+            await this.redis.set(`get-movie-${id}`,movie.toJSON(),{ttl:this.config.get('NODE_ENV') === 'production'? 60*5 : 10})
+            console.log(`get-movie-${id} - hit without cache`)
             return res.status(200).json(movie.toJSON())
 
         }catch(err:any){
@@ -106,9 +112,17 @@ export class MovieController {
     })
     async getAll(@Res() res:Response):Promise<Response<Movie[]>>{
         try{
+            const cached = await this.redis.get(`get-all-movies`)
+            if(cached){
+                console.log(`get-all-movies - hit on cache`)
+                return res.status(200).json(cached) 
+            }
             const movies = await this.service.getAll()
-
-            return res.status(200).json([movies.map(mv => mv.toJSON())])
+            const finalMovies = [...movies.map(mv => mv.toJSON())]
+            // @ts-ignore
+            await this.redis.set(`get-all-movies`,finalMovies,{ttl:this.config.get('NODE_ENV') === 'production'?60*5 : 10})
+            console.log('get-all-movies - hit without cache')
+            return res.status(200).json(finalMovies)
         }catch(err:unknown){
             return res.status(400).json({message:"Something went wrong, please try again"})
         }
@@ -134,7 +148,6 @@ export class MovieController {
             const movie = await this.service.update(body)
             return res.status(200).json(movie.toJSON())
         }catch(err:unknown){
-            console.log(err)
             return res.status(400).json({message:"Something went wrong, please try again"})
         }
     }
