@@ -29,7 +29,7 @@ export class Movie {
   @IsString()
   @IsNotEmpty({message: 'Slug is required'})
   @ApiProperty({type:String, example:'velozes-e-furiosos-10-3e5faedc'})
-  private readonly slug: Slug
+  public readonly slug: Slug
   
   @Column({type:'varchar', length:50, name:'category', nullable:false})
   @IsString()
@@ -100,6 +100,7 @@ export class Movie {
   }): void {
     if (data.title) {
       this.title = data.title
+      this.slug.generate(data.title)
     }
     if (data.category) {
       this.category = data.category

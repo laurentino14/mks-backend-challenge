@@ -9,8 +9,8 @@ import {
 } from '@nestjs/common'
 import { ApiBearerAuth, ApiBody, ApiHeader, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { Response } from 'express'
+import { ErrorMessage } from 'src/contracts/errors'
 import { AuthService } from './auth.service'
-import { ErrorMessage } from './contracts/errors'
 import { CreateUserInputContract, SignInInputContract } from './contracts/user'
 import { Auth } from './entities/auth'
 
