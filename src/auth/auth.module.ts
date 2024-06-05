@@ -6,7 +6,7 @@ import { AuthService } from './auth.service';
 import { User } from './entities/user';
 
 @Module({
-  imports:[TypeOrmModule.forFeature([User]),JwtModule.register({
+  imports:[TypeOrmModule.forFeature([User]), JwtModule.register({
     global: true,
   })],
   providers: [AuthService],

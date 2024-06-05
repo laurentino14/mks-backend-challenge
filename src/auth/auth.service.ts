@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common'
-import { JwtService } from '@nestjs/jwt'
+import { ConfigService } from '@nestjs/config'
+import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateUserInputContract, SignInInputContract } from './contracts/user';
@@ -9,15 +10,19 @@ import { User, UserFactory } from './entities/user';
 
 @Injectable()
 export class AuthService {
-    constructor(@InjectRepository(User) private readonly userRepository:Repository<User>, private readonly jwtService: JwtService){}
+    constructor(@InjectRepository(User) private readonly userRepository:Repository<User>, private readonly jwtService: JwtService,private readonly config:ConfigService){}
 
     async signUp(data:CreateUserInputContract):Promise<Auth>{
         const user = UserFactory.create(data)
+        
+        user.password.hash()
+
         await this.userRepository.save(user)
+        
         user.password.omit()
 
-        const access_token = this.jwtService.sign({id:user.id},{expiresIn:'2h',secret:process.env.JWT_ACCESS_TOKEN_SECRET})
-        const refresh_token = this.jwtService.sign({id:user.id},{expiresIn:'7d'})
+        const access_token = this.jwtService.sign({id:user.id},{expiresIn:'2h',secret:this.config.get('JWT_ACCESS_TOKEN_SECRET')})
+        const refresh_token = this.jwtService.sign({id:user.id},{expiresIn:'7d',secret:this.config.get('JWT_REFRESH_TOKEN_SECRET')})
 
         return new Auth(user, access_token, refresh_token) 
     }
@@ -37,14 +42,14 @@ export class AuthService {
        
         user.password.omit()
 
-        const access_token = this.jwtService.sign({id:user.id},{expiresIn:'2h',secret:process.env.JWT_ACCESS_TOKEN_SECRET})
-        const refresh_token = this.jwtService.sign({id:user.id},{expiresIn:'7d',secret:process.env.JW_REFRESH_TOKEN_SECRET})
+        const access_token = this.jwtService.sign({id:user.id},{expiresIn:'2h',secret:this.config.get('JWT_ACCESS_TOKEN_SECRET')})
+        const refresh_token = this.jwtService.sign({id:user.id},{expiresIn:'7d',secret:this.config.get('JWT_REFRESH_TOKEN_SECRET')})
 
         return new Auth(user, access_token, refresh_token) 
     }
 
     async refreshToken(refresh_token:string):Promise<Auth>{
-        const decoded = this.jwtService.verify(refresh_token,{secret:process.env.JWT_REFRESH_TOKEN_SECRET})
+        const decoded = this.jwtService.verify(refresh_token,{secret:this.config.get('JWT_REFRESH_TOKEN_SECRET')})
         const user = await this.userRepository.findOne({where:{
             id:decoded.id
         }})
@@ -55,8 +60,8 @@ export class AuthService {
 
         user.password.omit()
 
-        const access_token = this.jwtService.sign({id:user.id},{expiresIn:'2h',secret:process.env.JWT_ACCESS_TOKEN_SECRET})
-        const new_refresh_token = this.jwtService.sign({id:user.id},{expiresIn:'7d',secret:process.env.JWT_REFRESH_TOKEN_SECRET})
+        const access_token = this.jwtService.sign({id:user.id},{expiresIn:'2h',secret:this.config.get('JWT_ACCESS_TOKEN_SECRET')})
+        const new_refresh_token = this.jwtService.sign({id:user.id},{expiresIn:'7d',secret:this.config.get('JWT_REFRESH_TOKEN_SECRET')})
         return new Auth(user, access_token, new_refresh_token) 
     }
 }

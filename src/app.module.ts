@@ -1,11 +1,15 @@
 import { Module } from '@nestjs/common'
-import { TypeOrmModule } from '@nestjs/typeorm'
+import { ConfigModule } from '@nestjs/config'
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { AuthService } from './auth/auth.service';
 import { User } from './auth/entities/user';
 import { Moovie } from './movie/entities/movie';
 @Module({
-  imports: [TypeOrmModule.forRoot({
+  imports: [ConfigModule.forRoot({
+    isGlobal:true,
+    cache:true,
+  }),TypeOrmModule.forRoot({
     type: 'postgres',
     host: process.env.DB_HOST || 'localhost',
     port: parseFloat(process.env.DB_PORT) || 5432,
