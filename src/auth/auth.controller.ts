@@ -114,6 +114,7 @@ export class AuthController {
             const auth = await this.service.refreshToken(splited[1])
             return res.status(200).json(auth)
         }catch(err:unknown){
+            console.log(err)
             return res.status(400).json({message:'Something went wrong, please try again'})
         }
     }

@@ -15,9 +15,9 @@ Ferramentas requeridas
 [x] 1. TypeScript
 [x] 2. Nest.js
 [x] 3. TypeORM 
-4. Swagger
+[x] 4. Swagger
 [x/?] 5. Docker
-6. Redis
+[x] 6. Redis
 [x] 7. PostgreSQL
 
 Aspectos técnicos

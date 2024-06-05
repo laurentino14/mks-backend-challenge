@@ -1,10 +1,13 @@
+import { CacheModule } from '@nestjs/cache-manager'
 import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { AuthModule } from './auth/auth.module';
-import { AuthService } from './auth/auth.service';
-import { User } from './auth/entities/user';
-import { Moovie } from './movie/entities/movie';
+import { TypeOrmModule } from '@nestjs/typeorm'
+import { redisStore } from 'cache-manager-redis-store'
+import type { RedisClientOptions } from 'redis'
+import { AuthModule } from './auth/auth.module'
+import { AuthService } from './auth/auth.service'
+import { User } from './auth/entities/user'
+import { Moovie } from './movie/entities/movie'
 @Module({
   imports: [ConfigModule.forRoot({
     isGlobal:true,
@@ -18,6 +21,11 @@ import { Moovie } from './movie/entities/movie';
     database: process.env.DB_NAME || 'dev',
     entities: [User,Moovie],
     synchronize: true,
+  }),CacheModule.register<RedisClientOptions>({
+      store: redisStore,
+      host: 'localhost',
+      port: 6379,
+      isGlobal: true,
   }),AuthModule],
   controllers: [],
   providers: [AuthService],
