@@ -7,7 +7,8 @@ import type { RedisClientOptions } from 'redis'
 import { AuthModule } from './auth/auth.module'
 import { AuthService } from './auth/auth.service'
 import { User } from './auth/entities/user'
-import { Moovie } from './movie/entities/movie'
+import { Movie } from './movie/entities/movie'
+import { MovieModule } from './movie/movie.module';
 @Module({
   imports: [ConfigModule.forRoot({
     isGlobal:true,
@@ -19,14 +20,14 @@ import { Moovie } from './movie/entities/movie'
     username: process.env.DB_USER || 'dev',
     password: process.env.DB_PASS || 'dev',
     database: process.env.DB_NAME || 'dev',
-    entities: [User,Moovie],
+    entities: [User,Movie],
     synchronize: true,
   }),CacheModule.register<RedisClientOptions>({
       store: redisStore,
       host: 'localhost',
       port: 6379,
       isGlobal: true,
-  }),AuthModule],
+  }),AuthModule, MovieModule],
   controllers: [],
   providers: [AuthService],
 })

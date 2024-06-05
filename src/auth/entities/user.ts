@@ -9,7 +9,7 @@ import { Password } from './password'
 export class User {
   @PrimaryColumn({ primary:true, type: 'text', name:'id'})
   @IsString()
-  @IsNotEmpty({ message: 'Name is required' })
+  @IsNotEmpty({ message: 'ID is required' })
   @ApiProperty({type:String, example:'3e5faedc-4365-4e00-a620-8a3929043ad2'})
   public readonly id: string
 
@@ -101,7 +101,7 @@ export class User {
     return this.deletedAt
   }
 
-  updateUser(data:{name?:string, email?:string, password?:string}){
+  update(data:{name?:string, email?:string, password?:string}){
     if(data.name) {
       this.name = data.name
     }
@@ -111,6 +111,7 @@ export class User {
     if(data.password) {
       this.password.updateValue(data.password)
     }
+    this.updatedAt = new Date().toISOString()
   }
 
   toJSON(){
