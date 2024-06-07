@@ -95,6 +95,39 @@ export class MovieController {
         }
     }
 
+    @Get('category/:category')
+    @ApiOperation({
+        summary:'Get by category',
+        description: 'Get all movies by category',
+    })
+    @ApiResponse({
+        status:200,
+        type:Movie,
+        description:'Success case'
+    })
+    @ApiResponse({
+        status:400,
+        type:ErrorMessage,
+        description:'Any error case'
+    })
+    async getByCategory(@Param('category') category:string,@Res() res:Response):Promise<Response<Movie[]>>{
+        try{
+            const cached = await this.redis.get(`get-movie-category-${category}`)
+            if(cached){
+                console.log(`get-movie-category-${category} - hit on cache`)
+                return res.status(200).json(cached) 
+            }
+            const movies = await this.service.getByCategory(category)
+            const finalMovies = [...movies.map(mv => mv.toJSON())]
+            // @ts-ignore
+            await this.redis.set(`get-movie-category-${category}`,finalMovies,{ttl:this.config.get('NODE_ENV') === 'production'?60*5 : 10})
+            console.log(`get-movie-category-${category} - hit without cache`)
+            return res.status(200).json(finalMovies)
+        }catch(err:unknown){
+            return res.status(400).json({message:"Something went wrong, please try again"})
+        }
+    }
+
     @Get()
     @ApiOperation({
         summary:'Get all',

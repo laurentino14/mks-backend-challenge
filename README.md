@@ -16,7 +16,7 @@ Ferramentas requeridas
 [x] 2. Nest.js
 [x] 3. TypeORM 
 [x] 4. Swagger
-[x/?] 5. Docker
+[x] 5. Docker
 [x] 6. Redis
 [x] 7. PostgreSQL
 

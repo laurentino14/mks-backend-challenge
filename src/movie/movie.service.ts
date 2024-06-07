@@ -44,7 +44,17 @@ export class MovieService {
     }
 
     async getByCategory(category:string):Promise<Movie[]>{
-        return await this.movieRepository.query('select * from movies where category = $1',[category])
+           const query = await this.movieRepository.query(`select * from movies where category = $1::text`,[category])
+           
+        return [...query.map((movie:{
+            id:string,
+            title:string,
+            slug:string,
+            category:string,
+            launchedIn:string,
+            createdAt:string,
+            updatedAt:string
+        })=>MovieFactory.restore(movie))]
     }
 
     async update(data:UpdateMovieInputContract):Promise<Movie>{
